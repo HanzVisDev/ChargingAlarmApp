@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+drawable ic_battery
+drawable ic_mute
+drawable ic_unmute
+mipmap ic_launcher
+mipmap ic_launcher_round
+raw default_alarm
+string app_name
+style Theme.ChargingAlarmApp
+xml backup_rules

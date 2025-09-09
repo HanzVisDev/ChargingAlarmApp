@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.chargingalarm.app-mergeDebugResources-65:/values-v31/values-v31.xml",
+            "map": [
+                {
+                    "source": "/Users/hanantahir/.gradle/caches/transforms-4/2eb0ef1c49323675c7ba8efe10e9d142/transformed/core-splashscreen-1.0.1/res/values-v31/values-v31.xml",
+                    "from": {
+                        "startLines": "2,9",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,473",
+                        "endLines": "8,13",
+                        "endColumns": "12,12",
+                        "endOffsets": "468,697"
+                    }
+                }
+            ]
+        }
+    ]
+}
