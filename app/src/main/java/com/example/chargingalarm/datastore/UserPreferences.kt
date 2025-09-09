@@ -23,7 +23,20 @@ object PrefKeys {
     val AlarmToneUri = stringPreferencesKey("alarm_tone_uri")
     val Theme = stringPreferencesKey("theme_preference")
     val AlarmMuted = booleanPreferencesKey("alarm_muted")
+    
+    // New preferences
+    val OverlayEnabled = booleanPreferencesKey("overlay_enabled")
+    val AnimationTemplate = stringPreferencesKey("animation_template")
+    val FullChargeAlarmEnabled = booleanPreferencesKey("full_charge_alarm_enabled")
+    val ChargeEndAlarmEnabled = booleanPreferencesKey("charge_end_alarm_enabled")
+    val RestrictedLimitAlarmEnabled = booleanPreferencesKey("restricted_limit_alarm_enabled")
+    val RestrictedLimitPercentage = stringPreferencesKey("restricted_limit_percentage")
+    val FullChargeToneUri = stringPreferencesKey("full_charge_tone_uri")
+    val ChargeEndToneUri = stringPreferencesKey("charge_end_tone_uri")
+    val RestrictedLimitToneUri = stringPreferencesKey("restricted_limit_tone_uri")
 }
+
+enum class AnimationTemplate { BUBBLE, NEON_WIRE, GRADIENT_PULSE }
 
 data class UserPrefs(
     val playOnChargeStart: Boolean = true,
@@ -32,6 +45,17 @@ data class UserPrefs(
     val alarmToneUri: Uri? = null,
     val themePreference: ThemePreference = ThemePreference.SYSTEM,
     val alarmMuted: Boolean = false,
+    
+    // New preferences
+    val overlayEnabled: Boolean = false,
+    val animationTemplate: AnimationTemplate = AnimationTemplate.BUBBLE,
+    val fullChargeAlarmEnabled: Boolean = false,
+    val chargeEndAlarmEnabled: Boolean = false,
+    val restrictedLimitAlarmEnabled: Boolean = false,
+    val restrictedLimitPercentage: Int = 80,
+    val fullChargeToneUri: Uri? = null,
+    val chargeEndToneUri: Uri? = null,
+    val restrictedLimitToneUri: Uri? = null,
 )
 
 class UserPreferencesRepository(private val context: Context) {
@@ -43,6 +67,17 @@ class UserPreferencesRepository(private val context: Context) {
             alarmToneUri = prefs[PrefKeys.AlarmToneUri]?.let { Uri.parse(it) },
             themePreference = prefs[PrefKeys.Theme]?.let { runCatching { ThemePreference.valueOf(it) }.getOrNull() } ?: ThemePreference.SYSTEM,
             alarmMuted = prefs[PrefKeys.AlarmMuted] ?: false,
+            
+            // New preferences
+            overlayEnabled = prefs[PrefKeys.OverlayEnabled] ?: false,
+            animationTemplate = prefs[PrefKeys.AnimationTemplate]?.let { runCatching { AnimationTemplate.valueOf(it) }.getOrNull() } ?: AnimationTemplate.BUBBLE,
+            fullChargeAlarmEnabled = prefs[PrefKeys.FullChargeAlarmEnabled] ?: false,
+            chargeEndAlarmEnabled = prefs[PrefKeys.ChargeEndAlarmEnabled] ?: false,
+            restrictedLimitAlarmEnabled = prefs[PrefKeys.RestrictedLimitAlarmEnabled] ?: false,
+            restrictedLimitPercentage = prefs[PrefKeys.RestrictedLimitPercentage]?.toIntOrNull() ?: 80,
+            fullChargeToneUri = prefs[PrefKeys.FullChargeToneUri]?.let { Uri.parse(it) },
+            chargeEndToneUri = prefs[PrefKeys.ChargeEndToneUri]?.let { Uri.parse(it) },
+            restrictedLimitToneUri = prefs[PrefKeys.RestrictedLimitToneUri]?.let { Uri.parse(it) },
         )
     }
 
@@ -65,5 +100,48 @@ class UserPreferencesRepository(private val context: Context) {
     }
     suspend fun setAlarmMuted(value: Boolean) {
         context.dataStore.edit { it[PrefKeys.AlarmMuted] = value }
+    }
+    
+    // New preference setters
+    suspend fun setOverlayEnabled(value: Boolean) {
+        context.dataStore.edit { it[PrefKeys.OverlayEnabled] = value }
+    }
+    
+    suspend fun setAnimationTemplate(value: AnimationTemplate) {
+        context.dataStore.edit { it[PrefKeys.AnimationTemplate] = value.name }
+    }
+    
+    suspend fun setFullChargeAlarmEnabled(value: Boolean) {
+        context.dataStore.edit { it[PrefKeys.FullChargeAlarmEnabled] = value }
+    }
+    
+    suspend fun setChargeEndAlarmEnabled(value: Boolean) {
+        context.dataStore.edit { it[PrefKeys.ChargeEndAlarmEnabled] = value }
+    }
+    
+    suspend fun setRestrictedLimitAlarmEnabled(value: Boolean) {
+        context.dataStore.edit { it[PrefKeys.RestrictedLimitAlarmEnabled] = value }
+    }
+    
+    suspend fun setRestrictedLimitPercentage(value: Int) {
+        context.dataStore.edit { it[PrefKeys.RestrictedLimitPercentage] = value.toString() }
+    }
+    
+    suspend fun setFullChargeTone(uri: Uri?) {
+        context.dataStore.edit {
+            if (uri != null) it[PrefKeys.FullChargeToneUri] = uri.toString() else it.remove(PrefKeys.FullChargeToneUri)
+        }
+    }
+    
+    suspend fun setChargeEndTone(uri: Uri?) {
+        context.dataStore.edit {
+            if (uri != null) it[PrefKeys.ChargeEndToneUri] = uri.toString() else it.remove(PrefKeys.ChargeEndToneUri)
+        }
+    }
+    
+    suspend fun setRestrictedLimitTone(uri: Uri?) {
+        context.dataStore.edit {
+            if (uri != null) it[PrefKeys.RestrictedLimitToneUri] = uri.toString() else it.remove(PrefKeys.RestrictedLimitToneUri)
+        }
     }
 }

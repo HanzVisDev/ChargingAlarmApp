@@ -21,6 +21,11 @@ import kotlinx.coroutines.launch
 data class BatteryState(
     val batteryPct: Int = 0,
     val isCharging: Boolean = false,
+    val powerLevel: Int = 0, // Watts
+    val temperature: Float = 0f, // Celsius
+    val timeLeft: String = "Unknown", // Time left to charge
+    val voltage: Int = 0, // Voltage in millivolts
+    val health: Int = 0 // Battery health percentage
 )
 
 class BatteryViewModel(application: Application) : AndroidViewModel(application) {
@@ -67,7 +72,44 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
         val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
         val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
         val pct = if (level >= 0 && scale > 0) ((level * 100f) / scale).toInt() else 0
-        _batteryState.value = _batteryState.value.copy(batteryPct = pct, isCharging = isCharging)
+        
+        // Get additional battery information
+        val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) / 10f // Convert to Celsius
+        val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
+        val health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1)
+        
+        // Calculate power level (approximate)
+        val powerLevel = if (isCharging && voltage > 0) {
+            // Rough estimation: voltage * current (estimated)
+            (voltage * 0.001f * 2.5f).toInt() // Simplified calculation
+        } else 0
+        
+        // Calculate time left (simplified)
+        val timeLeft = calculateTimeLeft(pct, isCharging)
+        
+        _batteryState.value = _batteryState.value.copy(
+            batteryPct = pct,
+            isCharging = isCharging,
+            powerLevel = powerLevel,
+            temperature = temperature,
+            timeLeft = timeLeft,
+            voltage = voltage,
+            health = health
+        )
+    }
+    
+    private fun calculateTimeLeft(batteryPct: Int, isCharging: Boolean): String {
+        if (!isCharging || batteryPct >= 100) return "Unknown"
+        
+        // Simplified calculation - in real app, you'd track charging rate over time
+        val remainingPct = 100 - batteryPct
+        val estimatedHours = remainingPct / 20f // Assume ~20% per hour charging rate
+        
+        return when {
+            estimatedHours < 1 -> "${(estimatedHours * 60).toInt()} min"
+            estimatedHours < 24 -> "${estimatedHours.toInt()}h ${((estimatedHours % 1) * 60).toInt()}m"
+            else -> "${(estimatedHours / 24).toInt()}d ${(estimatedHours % 24).toInt()}h"
+        }
     }
 
     private fun setCharging(value: Boolean) {
@@ -78,3 +120,4 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch { userPrefsRepository.setAlarmMuted(muted) }
     }
 }
+
