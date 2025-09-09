@@ -396,6 +396,7 @@ fun RecentActivityCard(recentHistory: List<ChargingHistory>) {
 fun RecentActivityItem(event: ChargingHistory) {
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
+    val date = Date(event.timestamp)
     
     Row(
         modifier = Modifier
@@ -423,7 +424,7 @@ fun RecentActivityItem(event: ChargingHistory) {
                 fontSize = 14.sp
             )
             Text(
-                text = "${dateFormat.format(event.timestamp)} ${timeFormat.format(event.timestamp)}",
+                text = "${dateFormat.format(date)} ${timeFormat.format(date)}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

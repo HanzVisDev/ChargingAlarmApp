@@ -2,7 +2,6 @@ package com.example.chargingalarm.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
 
 @Dao
 interface ChargingHistoryDao {
@@ -13,7 +12,7 @@ interface ChargingHistoryDao {
     fun getHistoryByEventType(eventType: String): Flow<List<ChargingHistory>>
     
     @Query("SELECT * FROM charging_history WHERE timestamp >= :startDate ORDER BY timestamp DESC")
-    fun getHistorySince(startDate: Date): Flow<List<ChargingHistory>>
+    fun getHistorySince(startDate: Long): Flow<List<ChargingHistory>>
     
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHistory(history: ChargingHistory)
@@ -22,5 +21,5 @@ interface ChargingHistoryDao {
     suspend fun deleteHistory(history: ChargingHistory)
     
     @Query("DELETE FROM charging_history WHERE timestamp < :cutoffDate")
-    suspend fun deleteOldHistory(cutoffDate: Date)
+    suspend fun deleteOldHistory(cutoffDate: Long)
 }

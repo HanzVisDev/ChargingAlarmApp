@@ -12,6 +12,7 @@ data class ChargingHistory(
     val isCharging: Boolean,
     val powerLevel: Int? = null,
     val temperature: Float? = null,
-    val timestamp: Date = Date(),
+    val voltage: Int? = null,
+    val timestamp: Long = System.currentTimeMillis(),
     val eventType: String // "CONNECTED", "DISCONNECTED", "LEVEL_CHANGE", "FULL_CHARGE"
 )

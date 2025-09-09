@@ -67,7 +67,7 @@ class ChargingReceiver : BroadcastReceiver() {
                     temperature = temperature,
                     voltage = voltage,
                     eventType = eventType,
-                    timestamp = Date()
+                    timestamp = System.currentTimeMillis()
                 )
                 
                 val database = AppDatabase.getDatabase(context)
