@@ -5,8 +5,13 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        ANDROID_HOME: $HOME/Library/Android/sdk
+        ANDROID_HOME: /Users/builder/Library/Android/sdk
+        ANDROID_SDK_ROOT: /Users/builder/Library/Android/sdk
     scripts:
+      - name: Normalize Android SDK path
+        script: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          unset ANDROID_SDK_ROOT
       - name: Clean
         script: ./gradlew clean
       - name: Assemble Debug
