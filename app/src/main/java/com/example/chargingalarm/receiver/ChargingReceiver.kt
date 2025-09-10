@@ -1,5 +1,7 @@
 package com.example.chargingalarm.receiver
 
+import kotlinx.coroutines.flow.first
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -86,7 +88,7 @@ class ChargingReceiver : BroadcastReceiver() {
             }
         }
     }
-
+    
     private fun readTemperatureFallback(context: Context): Float {
         return try {
             val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
@@ -98,4 +100,3 @@ class ChargingReceiver : BroadcastReceiver() {
         }
     }
 }
-
