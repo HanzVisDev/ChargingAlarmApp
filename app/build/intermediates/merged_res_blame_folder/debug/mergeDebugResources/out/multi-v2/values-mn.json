@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.chargingalarm.app-mergeDebugResources-65:/values-mn/values-mn.xml",
+            "outputFile": "com.example.chargingalarm.app-mergeDebugResources-66:/values-mn/values-mn.xml",
             "map": [
                 {
                     "source": "/Users/hanantahir/.gradle/caches/transforms-4/479c78f3008d0a6d9c91ac9cf5734b05/transformed/foundation-release/res/values-mn/values-mn.xml",

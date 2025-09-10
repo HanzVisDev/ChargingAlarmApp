@@ -9,6 +9,7 @@ import com.example.chargingalarm.data.AppDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 data class AlarmState(
@@ -53,7 +54,7 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     
     fun checkAlarms(batteryPct: Int, isCharging: Boolean, wasCharging: Boolean) {
         viewModelScope.launch {
-            val prefs = userPrefsRepository.prefsFlow.value
+            val prefs = userPrefsRepository.prefsFlow.first()
             
             // Check for full charge alarm
             if (prefs.fullChargeAlarmEnabled && batteryPct >= 100 && isCharging) {
