@@ -43,7 +43,7 @@ fun SettingsScreen(
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Theme Settings
+        // Theme Settings (simplified)
         SettingsSection("Appearance") {
             SettingSwitch(
                 title = "Dark Mode",
@@ -53,15 +53,6 @@ fun SettingsScreen(
                         userPrefsRepository.setThemePreference(
                             if (enabled) ThemePreference.DARK else ThemePreference.LIGHT
                         )
-                    }
-                }
-            )
-            
-            ThemePreferenceSelector(
-                currentTheme = prefs?.themePreference ?: ThemePreference.SYSTEM,
-                onThemeSelected = { theme ->
-                    scope.launch {
-                        userPrefsRepository.setThemePreference(theme)
                     }
                 }
             )
@@ -85,9 +76,7 @@ fun SettingsScreen(
             AnimationTemplateSelector(
                 currentTemplate = prefs?.animationTemplate ?: AnimationTemplate.BUBBLE,
                 onTemplateSelected = { template ->
-                    scope.launch {
-                        userPrefsRepository.setAnimationTemplate(template)
-                    }
+                    scope.launch { userPrefsRepository.setAnimationTemplate(template) }
                 }
             )
         }

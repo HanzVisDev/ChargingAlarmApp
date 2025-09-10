@@ -33,8 +33,16 @@ class ChargingReceiver : BroadcastReceiver() {
                 startService(context, AlarmService.ACTION_UPDATE_NOTIFICATION, pct)
                 
                 // Check for full charge
-                if (pct >= 100) {
-                    logChargingEvent(context, intent, "FULL_CHARGE")
+                val prefs = com.example.chargingalarm.datastore.UserPreferencesRepository(context)
+                scope.launch {
+                    val p = prefs.prefsFlow.first()
+                    if (pct >= 100 && p.fullChargeAlarmEnabled) {
+                        logChargingEvent(context, intent, "FULL_CHARGE")
+                        startService(context, AlarmService.ACTION_ALARM_FULL_CHARGE)
+                    }
+                    if (p.restrictedLimitAlarmEnabled && pct >= p.restrictedLimitPercentage) {
+                        startService(context, AlarmService.ACTION_ALARM_RESTRICTED_LIMIT)
+                    }
                 }
             }
         }
@@ -58,7 +66,8 @@ class ChargingReceiver : BroadcastReceiver() {
                 val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
                 val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
                 
-                val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) / 10f
+                val tempRaw = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE)
+                val temperature = if (tempRaw == Int.MIN_VALUE) readTemperatureFallback(context) else tempRaw / 10f
                 val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
                 
                 val history = ChargingHistory(
@@ -75,6 +84,17 @@ class ChargingReceiver : BroadcastReceiver() {
             } catch (e: Exception) {
                 android.util.Log.e("ChargingReceiver", "Error logging charging event", e)
             }
+        }
+    }
+
+    private fun readTemperatureFallback(context: Context): Float {
+        return try {
+            val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            // Some devices expose BATTERY_PROPERTY_TEMPERATURE in tenths of a degree
+            val tempTenths = bm.getIntProperty(5 /* BATTERY_PROPERTY_TEMPERATURE unofficial */)
+            if (tempTenths != 0) tempTenths / 10f else Float.NaN
+        } catch (_: Exception) {
+            Float.NaN
         }
     }
 }

@@ -126,11 +126,15 @@ fun BatteryBubbleCard(batteryState: com.example.chargingalarm.viewmodel.BatteryS
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier.size(220.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp),
                 contentAlignment = Alignment.Center
             ) {
                 // Background circle
@@ -218,8 +222,10 @@ fun BatteryInfoCard(batteryState: com.example.chargingalarm.viewmodel.BatterySta
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             BatteryInfoItem(
                 icon = Icons.Filled.Schedule,
@@ -236,7 +242,7 @@ fun BatteryInfoCard(batteryState: com.example.chargingalarm.viewmodel.BatterySta
             BatteryInfoItem(
                 icon = Icons.Filled.Thermostat,
                 label = "Temperature",
-                value = "${batteryState.temperature.toInt()}°C"
+                value = if (batteryState.temperature.isNaN()) "—" else "${batteryState.temperature.toInt()}°C"
             )
         }
     }
@@ -441,12 +447,10 @@ fun FooterBranding() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Small icon placeholder - you can replace with actual icon from URL
-        Icon(
-            imageVector = Icons.Filled.Favorite,
+        androidx.compose.foundation.Image(
+            painter = androidx.compose.ui.res.painterResource(id = com.example.chargingalarm.R.drawable.ic_keystone_logo),
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(18.dp)
         )
         
         Text(

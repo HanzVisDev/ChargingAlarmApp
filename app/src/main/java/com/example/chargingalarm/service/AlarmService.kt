@@ -45,6 +45,24 @@ class AlarmService : Service() {
             ACTION_MUTE -> mute()
             ACTION_UNMUTE -> unmute()
             ACTION_UPDATE_NOTIFICATION -> updateNotification(intent.getIntExtra(EXTRA_BATTERY_PCT, -1))
+            ACTION_ALARM_FULL_CHARGE -> scope.launch {
+                val p = prefs.prefsFlow.first()
+                if (!lastFullChargeFired) {
+                    triggerAlarm(p.fullChargeToneUri ?: p.alarmToneUri, p.vibrateOnAlarm)
+                    lastFullChargeFired = true
+                }
+            }
+            ACTION_ALARM_RESTRICTED_LIMIT -> scope.launch {
+                val p = prefs.prefsFlow.first()
+                if (!lastRestrictedLimitFired) {
+                    triggerAlarm(p.restrictedLimitToneUri ?: p.alarmToneUri, p.vibrateOnAlarm)
+                    lastRestrictedLimitFired = true
+                }
+            }
+            ACTION_ALARM_CHARGE_END -> scope.launch {
+                val p = prefs.prefsFlow.first()
+                triggerAlarm(p.chargeEndToneUri ?: p.alarmToneUri, p.vibrateOnAlarm)
+            }
         }
         if (!isForegroundStarted) {
             startForeground(NOTIF_ID, buildNotification(-1, null))
@@ -70,6 +88,9 @@ class AlarmService : Service() {
                 triggerAlarm(p.alarmToneUri, p.vibrateOnAlarm)
             }
             updateNotification(-1, false)
+            // Reset one-shot flags so they can fire again on next session
+            lastRestrictedLimitFired = false
+            lastFullChargeFired = false
         }
     }
 
@@ -160,5 +181,14 @@ class AlarmService : Service() {
         const val ACTION_MUTE = "com.example.chargingalarm.ACTION_MUTE"
         const val ACTION_UNMUTE = "com.example.chargingalarm.ACTION_UNMUTE"
         const val EXTRA_BATTERY_PCT = "extra_battery_pct"
+
+        // New specific alarm actions
+        const val ACTION_ALARM_FULL_CHARGE = "com.example.chargingalarm.ACTION_ALARM_FULL_CHARGE"
+        const val ACTION_ALARM_RESTRICTED_LIMIT = "com.example.chargingalarm.ACTION_ALARM_RESTRICTED_LIMIT"
+        const val ACTION_ALARM_CHARGE_END = "com.example.chargingalarm.ACTION_ALARM_CHARGE_END"
+
+        // Simple in-memory suppression flags (reset when unplugged)
+        @Volatile var lastRestrictedLimitFired: Boolean = false
+        @Volatile var lastFullChargeFired: Boolean = false
     }
 }
